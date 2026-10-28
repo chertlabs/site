@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { MoonshineRouter } from "@tschk/moonshine/router";
+import { MARK } from "./mark";
 
 export const ROUTES = [{ path: "/", title: "chertlabs" }] as const;
 
@@ -92,7 +93,7 @@ function Wordmark() {
   }, []);
   return (
     <h1
-      className="m-0 mb-10 flex flex-wrap items-baseline gap-x-[0.35em] text-[clamp(44px,12vw,104px)] leading-none font-bold tracking-[-0.04em]"
+      className="m-0 mb-12 flex flex-wrap items-baseline gap-x-[0.35em] text-[clamp(44px,12vw,104px)] leading-none font-bold tracking-[-0.04em]"
       aria-label="chert labs"
     >
       <span
@@ -119,6 +120,12 @@ function Wordmark() {
 function Home() {
   return (
     <>
+      <pre
+        className="m-0 mb-6 overflow-hidden text-[clamp(5px,1.6vw,11px)] leading-[1.05] font-bold bg-[linear-gradient(170deg,#f2913d_30%,#26336a_75%)] bg-clip-text text-transparent select-none"
+        aria-hidden="true"
+      >
+        {MARK}
+      </pre>
       <Wordmark />
       <Block cmd="cat about">
         <p className="m-0">
@@ -213,17 +220,86 @@ const routes = [
   },
 ];
 
+const ELSEWHERE: Array<[string, string, string]> = [
+  [
+    "autophobia",
+    "six friends who always text back",
+    "https://autophobia.chertlabs.com",
+  ],
+  ["kyu", "someone who answers, honestly", "https://kyu.chertlabs.com"],
+  ["strangers", "someone always picks up", "https://strangers.chertlabs.com"],
+];
+
+const BUBBLE = "m-0 max-w-[32ch] rounded-2xl px-3 py-1.5";
+
+function Missing() {
+  const [path, setPath] = useState("this page");
+  const [stage, setStage] = useState(0);
+  useEffect(() => {
+    setPath(location.pathname);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStage(5);
+      return;
+    }
+    const timers = [1600, 2400, 3600, 5200, 6200].map((ms, i) =>
+      setTimeout(() => setStage(i + 1), ms),
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+  return (
+    <>
+      <Block cmd={`facetime ${path}`}>
+        <p className="m-0 text-neutral-500">
+          {stage < 1 ? "calling…" : "no answer. 404."}
+        </p>
+      </Block>
+      {stage >= 2 ? (
+        <Block cmd={`imessage ${path}`}>
+          <div className="flex flex-col items-end gap-1">
+            <p className={`${BUBBLE} bg-[#0a84ff] text-white`}>hello?</p>
+            <p className="m-0 text-xs text-[#ff453a]">
+              {stage >= 3 ? "Not Delivered" : "Sending…"}
+            </p>
+          </div>
+          {stage >= 4 ? (
+            <div className="flex flex-col items-start gap-1">
+              <p className={`${BUBBLE} bg-neutral-800 text-neutral-200`}>
+                there's nothing here. there never was.
+              </p>
+              <p className="m-0 text-xs text-neutral-500">unknown</p>
+            </div>
+          ) : null}
+        </Block>
+      ) : null}
+      {stage >= 5 ? (
+        <Block cmd="ls ~/ --someone-who-answers">
+          <ul className="m-0 list-none p-0">
+            {ELSEWHERE.map(([name, what, url]) => (
+              <li
+                key={name}
+                className="mb-2 grid grid-cols-1 sm:mb-0 sm:grid-cols-[14ch_1fr] sm:gap-[2ch]"
+              >
+                <a className={LINK} href={url}>
+                  {name}/
+                </a>
+                <span>{what}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="m-0">
+            <a className={LINK} href="/">
+              cd ~
+            </a>
+          </p>
+        </Block>
+      ) : null}
+    </>
+  );
+}
+
 const notFound = (
   <Shell title="chertlabs / 404">
-    <Prompt>cd .</Prompt>
-    <div className="pl-[2ch] space-y-2">
-      <p className="m-0">bash: no such file or directory</p>
-      <p className="m-0">
-        <a className={LINK} href="/">
-          cd ~
-        </a>
-      </p>
-    </div>
+    <Missing />
   </Shell>
 );
 
