@@ -6,7 +6,7 @@ export const ROUTES = [{ path: "/", title: "chertlabs" }] as const;
 const PRODUCTS: Array<[string, string, string | null]> = [
   [
     "autophobia",
-    "a week-long horror story told over text. six new friends.",
+    "a week-long psychological horror over text and facetime. six new friends. call any of them.",
     "https://autophobia.chertlabs.com",
   ],
   [
