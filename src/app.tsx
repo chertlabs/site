@@ -7,17 +7,17 @@ const PRODUCTS: Array<[string, string, string | null]> = [
   [
     "autophobia",
     "a week-long horror story told over text. six new friends.",
-    "https://autophobia.tsc.hk",
+    "https://autophobia.chertlabs.com",
   ],
   [
     "kyu",
     "someone to text. honestly. a companion that lives in your messages.",
-    "https://kyu.tsc.hk",
+    "https://kyu.chertlabs.com",
   ],
   [
     "strangers",
     "call a number on facetime. talk to a stranger.",
-    "https://strangers.tsc.hk",
+    "https://strangers.chertlabs.com",
   ],
   [
     "together",

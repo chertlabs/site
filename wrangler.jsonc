@@ -3,5 +3,5 @@
   "account_id": "fc62a6e6528bec6d3d81c3bf8967ceeb",
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./dist", "not_found_handling": "404-page" },
-  "routes": [{ "pattern": "chertlabs.tsc.hk", "custom_domain": true }],
+  "routes": [{ "pattern": "chertlabs.com", "custom_domain": true }],
 }
