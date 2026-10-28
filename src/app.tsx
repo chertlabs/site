@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { MoonshineRouter } from "@tschk/moonshine/router";
+import { GLYPHS } from "./glyphs";
 import { MARK } from "./mark";
 
 export const ROUTES = [{ path: "/", title: "chertlabs" }] as const;
@@ -59,15 +60,31 @@ function Block({ cmd, children }: { cmd: string; children: ReactNode }) {
 
 const FROM = ["ч", "", "е", "р", "т"];
 const TO = ["c", "h", "e", "r", "t"];
-const NOISE = "чжшщэюяbdfkrtx#%";
+const NOISE = ".:-=+*#%";
 const LOCK = [7, 10, 13, 16, 19];
 const DONE = LOCK[LOCK.length - 1];
+const ROWS = GLYPHS.c.length;
 
-function glyph(i: number, tick: number): string {
-  if (tick < 0) return FROM[i];
-  if (tick >= LOCK[i]) return TO[i];
-  if (i === 1 && tick < 2) return "";
-  return NOISE[(tick * 7 + i * 5) % NOISE.length];
+function glyph(i: number, tick: number): string[] {
+  if (tick < 0) return FROM[i] ? GLYPHS[FROM[i]] : GLYPHS[TO[i]];
+  if (tick >= LOCK[i]) return GLYPHS[TO[i]];
+  return GLYPHS[TO[i]].map((row, r) =>
+    row.replace(
+      /\S/g,
+      (_, c: number) => NOISE[(tick * 7 + i * 5 + r * 3 + c) % NOISE.length],
+    ),
+  );
+}
+
+function Letter({ rows, width }: { rows: string[]; width: string | number }) {
+  return (
+    <span
+      className="inline-block overflow-hidden whitespace-pre align-top transition-[max-width] duration-300 ease-out"
+      style={{ maxWidth: width }}
+    >
+      {rows.map((row) => row.padEnd(7)).join("\n")}
+    </span>
+  );
 }
 
 function Wordmark() {
@@ -93,26 +110,26 @@ function Wordmark() {
   }, []);
   return (
     <h1
-      className="m-0 mb-12 flex flex-wrap items-baseline gap-x-[0.35em] text-[clamp(44px,12vw,104px)] leading-none font-bold tracking-[-0.04em]"
+      className="m-0 mb-10 text-[clamp(6px,1.9vw,13px)] leading-[1.05] font-bold select-none"
       aria-label="chert labs"
     >
-      <span
-        className="whitespace-nowrap bg-[linear-gradient(135deg,#d58a48_20%,#2c3b72_85%)] bg-clip-text text-transparent"
-        aria-hidden="true"
-      >
-        {TO.map((_, i) => (
-          <span
-            key={i}
-            className="inline-block overflow-hidden align-bottom transition-[max-width] duration-300 ease-out"
-            style={{ maxWidth: i === 1 && tick < 1 ? 0 : "1ch" }}
-          >
-            {glyph(i, tick) || "\u00a0"}
-          </span>
-        ))}
-      </span>
-      <span className="text-neutral-600" aria-hidden="true">
-        labs
-      </span>
+      <pre className="m-0 overflow-hidden" aria-hidden="true">
+        <span className="inline-block bg-[linear-gradient(170deg,#f2913d_25%,#26336a_85%)] bg-clip-text text-transparent">
+          {TO.map((_, i) => (
+            <Letter
+              key={i}
+              rows={glyph(i, tick)}
+              width={i === 1 && tick < 1 ? 0 : "7ch"}
+            />
+          ))}
+        </span>
+        <span className="text-neutral-500">
+          <Letter rows={Array(ROWS).fill("")} width="3ch" />
+          {["l", "a", "b", "s"].map((c) => (
+            <Letter key={c} rows={GLYPHS[c]} width="7ch" />
+          ))}
+        </span>
+      </pre>
     </h1>
   );
 }
@@ -121,7 +138,7 @@ function Home() {
   return (
     <>
       <pre
-        className="m-0 mb-6 overflow-hidden text-[clamp(5px,1.6vw,11px)] leading-[1.05] font-bold bg-[linear-gradient(170deg,#f2913d_30%,#26336a_75%)] bg-clip-text text-transparent select-none"
+        className="m-0 mb-6 overflow-hidden text-[clamp(6px,1.9vw,13px)] leading-[1.05] font-bold bg-[linear-gradient(170deg,#f2913d_30%,#26336a_75%)] bg-clip-text text-transparent select-none"
         aria-hidden="true"
       >
         {MARK}
