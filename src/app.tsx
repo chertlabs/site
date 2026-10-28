@@ -1,6 +1,5 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { MoonshineRouter } from "@tschk/moonshine/router";
-import { MARK } from "./mark";
 
 export const ROUTES = [{ path: "/", title: "chertlabs" }] as const;
 
@@ -57,17 +56,71 @@ function Block({ cmd, children }: { cmd: string; children: ReactNode }) {
   );
 }
 
+const FROM = ["ч", "", "е", "р", "т"];
+const TO = ["c", "h", "e", "r", "t"];
+const NOISE = "чжшщэюяbdfkrtx#%";
+const LOCK = [7, 10, 13, 16, 19];
+const DONE = LOCK[LOCK.length - 1];
+
+function glyph(i: number, tick: number): string {
+  if (tick < 0) return FROM[i];
+  if (tick >= LOCK[i]) return TO[i];
+  if (i === 1 && tick < 2) return "";
+  return NOISE[(tick * 7 + i * 5) % NOISE.length];
+}
+
+function Wordmark() {
+  const [tick, setTick] = useState(-1);
+  useEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setTick(DONE);
+      return;
+    }
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const start = setTimeout(() => {
+      timer = setInterval(() => {
+        setTick((t) => {
+          if (t + 1 >= DONE) clearInterval(timer);
+          return Math.min(t + 1, DONE);
+        });
+      }, 60);
+    }, 900);
+    return () => {
+      clearTimeout(start);
+      clearInterval(timer);
+    };
+  }, []);
+  return (
+    <h1
+      className="m-0 mb-10 flex flex-wrap items-baseline gap-x-[0.35em] text-[clamp(44px,12vw,104px)] leading-none font-bold tracking-[-0.04em]"
+      aria-label="chert labs"
+    >
+      <span
+        className="whitespace-nowrap bg-[linear-gradient(135deg,#d58a48_20%,#2c3b72_85%)] bg-clip-text text-transparent"
+        aria-hidden="true"
+      >
+        {TO.map((_, i) => (
+          <span
+            key={i}
+            className="inline-block overflow-hidden align-bottom transition-[max-width] duration-300 ease-out"
+            style={{ maxWidth: i === 1 && tick < 1 ? 0 : "1ch" }}
+          >
+            {glyph(i, tick) || "\u00a0"}
+          </span>
+        ))}
+      </span>
+      <span className="text-neutral-600" aria-hidden="true">
+        labs
+      </span>
+    </h1>
+  );
+}
+
 function Home() {
   return (
     <>
-      <pre
-        className="m-0 mb-8 overflow-hidden text-[clamp(5px,1.55vw,11px)] leading-[1.05] font-bold bg-[linear-gradient(135deg,#d58a48_20%,#2c3b72_75%)] bg-clip-text text-transparent select-none"
-        aria-hidden="true"
-      >
-        {MARK}
-      </pre>
+      <Wordmark />
       <Block cmd="cat about">
-        <h1 className="m-0 text-base font-bold">chert labs</h1>
         <p className="m-0">
           an experimental product lab from{" "}
           <a className={LINK} href="https://www.trychert.com">
