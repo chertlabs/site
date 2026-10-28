@@ -31,9 +31,15 @@ const PRODUCTS: Array<[string, string, string | null]> = [
 const LINK =
   "text-white underline underline-offset-3 hover:bg-white hover:text-black hover:no-underline focus-visible:bg-white focus-visible:text-black focus-visible:outline-none";
 
-function Prompt({ children }: { children: ReactNode }) {
+function Prompt({
+  children,
+  hidden = false,
+}: {
+  children: ReactNode;
+  hidden?: boolean;
+}) {
   return (
-    <p className="m-0">
+    <p className={hidden ? "ty invisible m-0" : "m-0"}>
       <span className="text-neutral-500" aria-hidden="true">
         chertlabs:~$
       </span>{" "}
@@ -92,7 +98,7 @@ function Block({
 }) {
   return (
     <section className="mb-7" aria-label={cmd}>
-      <Prompt>
+      <Prompt hidden={t < at}>
         <Typed text={cmd} at={at} t={t} />
       </Prompt>
       <div
@@ -133,10 +139,10 @@ function Letter({ rows, width }: { rows: string[]; width: string | number }) {
   );
 }
 
-function Wordmark({ tick }: { tick: number }) {
+function Wordmark({ tick, hidden }: { tick: number; hidden: boolean }) {
   return (
     <h1
-      className="m-0 mb-10 text-[clamp(6px,1.9vw,13px)] leading-[1.05] font-bold select-none"
+      className={`${hidden ? "ty invisible " : ""}m-0 mb-10 text-[clamp(6px,1.9vw,13px)] leading-[1.05] font-bold select-none`}
       aria-label="chert labs"
     >
       <pre className="m-0 overflow-hidden" aria-hidden="true">
@@ -194,7 +200,7 @@ function Home() {
           </span>
         ))}
       </pre>
-      <Wordmark tick={t >= WORD_AT ? tick : -1} />
+      <Wordmark tick={t >= WORD_AT ? tick : -1} hidden={t < WORD_AT} />
       <Block cmd="cat about" at={ABOUT_AT} t={t}>
         <p className="m-0">
           an experimental product lab from{" "}
@@ -249,9 +255,9 @@ function Home() {
           </a>
         </p>
       </Block>
-      <Prompt>
+      <Prompt hidden={t < END}>
         <span
-          className={`${t >= END ? "" : "ty invisible "}inline-block h-[1.15em] w-[1ch] bg-white align-text-bottom animate-[blink_1.1s_steps(1)_infinite] motion-reduce:animate-none`}
+          className={`inline-block h-[1.15em] w-[1ch] bg-white align-text-bottom animate-[blink_1.1s_steps(1)_infinite] motion-reduce:animate-none`}
           aria-hidden="true"
         />
       </Prompt>
