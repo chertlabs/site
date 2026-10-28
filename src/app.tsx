@@ -126,7 +126,11 @@ function Wordmark() {
         <span className="text-neutral-500">
           <Letter rows={Array(ROWS).fill("")} width="3ch" />
           {["l", "a", "b", "s"].map((c) => (
-            <Letter key={c} rows={GLYPHS[c]} width="7ch" />
+            <Letter
+              key={c}
+              rows={GLYPHS[c]}
+              width={`${Math.max(...GLYPHS[c].map((r) => r.trimEnd().length)) + 1}ch`}
+            />
           ))}
         </span>
       </pre>
