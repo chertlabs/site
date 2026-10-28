@@ -1,6 +1,6 @@
 {
   "name": "chertlabs-site",
-  "account_id": "fc62a6e6528bec6d3d81c3bf8967ceeb",
+  "account_id": "aeede1e14bcf98858dcb5c6f1ae24bec",
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./dist", "not_found_handling": "404-page" },
   "routes": [{ "pattern": "chertlabs.com", "custom_domain": true }],

@@ -1,6 +1,6 @@
 # chertlabs site
 
-The Chert Labs front page. A static [moonshine](https://moonshine.tsc.hk) site served as a Cloudflare Workers static asset.
+The Chert Labs front page. A static [moonshine](https://moonshine.tsc.hk) site styled with [UnoCSS](https://unocss.dev), served as a Cloudflare Workers static asset.
 
 ```sh
 bun install
