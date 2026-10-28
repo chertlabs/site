@@ -3,7 +3,12 @@ import { MoonshineRouter } from "@tschk/moonshine/router";
 import { GLYPHS } from "./glyphs";
 import { MARK } from "./mark";
 
-export const ROUTES = [{ path: "/", title: "chertlabs" }] as const;
+export const ROUTES = [
+  {
+    path: "/",
+    title: "chertlabs · games and apps inside facetime and imessage",
+  },
+] as const;
 
 const PRODUCTS: Array<[string, string, string | null]> = [
   [
@@ -280,7 +285,7 @@ const routes = [
   {
     path: "/",
     element: (
-      <Shell title="chertlabs">
+      <Shell title="chertlabs · games and apps inside facetime and imessage">
         <Home />
       </Shell>
     ),
