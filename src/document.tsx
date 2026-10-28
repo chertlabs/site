@@ -27,6 +27,7 @@ export function renderDocument(path: string, css: string): string {
     '<meta name="color-scheme" content="dark">',
     '<meta name="theme-color" content="#000000">',
     `<style>${css}</style>`,
+    "<noscript><style>.ty{visibility:visible!important}</style></noscript>",
     "</head>",
     "<body>",
     `<div id="root">${body}</div>`,

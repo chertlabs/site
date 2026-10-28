@@ -28,13 +28,6 @@ const PRODUCTS: Array<[string, string, string | null]> = [
   ],
 ];
 
-const LOG: Array<[string, string, string]> = [
-  ["03:12", "autophobia", "wren read your message. wren is typing."],
-  ["08:02", "kyu", "it remembered what you said last night."],
-  ["21:47", "strangers", "someone picked up. they were already talking."],
-  ["--:--", "together", "not yet."],
-];
-
 const LINK =
   "text-white underline underline-offset-3 hover:bg-white hover:text-black hover:no-underline focus-visible:bg-white focus-visible:text-black focus-visible:outline-none";
 
@@ -49,11 +42,64 @@ function Prompt({ children }: { children: ReactNode }) {
   );
 }
 
-function Block({ cmd, children }: { cmd: string; children: ReactNode }) {
+const CHAR = 28;
+const SHOWN = Number.MAX_SAFE_INTEGER;
+
+function useClock(end: number): number {
+  const [t, setT] = useState(0);
+  useEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setT(SHOWN);
+      return;
+    }
+    const t0 = performance.now();
+    let frame = 0;
+    const step = () => {
+      const now = performance.now() - t0;
+      setT(now < end ? now : SHOWN);
+      if (now < end) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [end]);
+  return t;
+}
+
+function typed(text: string, at: number) {
+  return at + text.length * CHAR;
+}
+
+function Typed({ text, at, t }: { text: string; at: number; t: number }) {
+  const n = Math.max(0, Math.min(text.length, Math.floor((t - at) / CHAR)));
+  return (
+    <>
+      {text.slice(0, n)}
+      <span className="ty invisible">{text.slice(n)}</span>
+    </>
+  );
+}
+
+function Block({
+  cmd,
+  children,
+  at = 0,
+  t = SHOWN,
+}: {
+  cmd: string;
+  children: ReactNode;
+  at?: number;
+  t?: number;
+}) {
   return (
     <section className="mb-7" aria-label={cmd}>
-      <Prompt>{cmd}</Prompt>
-      <div className="pl-[2ch] space-y-2">{children}</div>
+      <Prompt>
+        <Typed text={cmd} at={at} t={t} />
+      </Prompt>
+      <div
+        className={`pl-[2ch] space-y-2 ${t >= typed(cmd, at) + 80 ? "" : "ty invisible"}`}
+      >
+        {children}
+      </div>
     </section>
   );
 }
@@ -87,27 +133,7 @@ function Letter({ rows, width }: { rows: string[]; width: string | number }) {
   );
 }
 
-function Wordmark() {
-  const [tick, setTick] = useState(-1);
-  useEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setTick(DONE);
-      return;
-    }
-    let timer: ReturnType<typeof setInterval> | undefined;
-    const start = setTimeout(() => {
-      timer = setInterval(() => {
-        setTick((t) => {
-          if (t + 1 >= DONE) clearInterval(timer);
-          return Math.min(t + 1, DONE);
-        });
-      }, 60);
-    }, 900);
-    return () => {
-      clearTimeout(start);
-      clearInterval(timer);
-    };
-  }, []);
+function Wordmark({ tick }: { tick: number }) {
   return (
     <h1
       className="m-0 mb-10 text-[clamp(6px,1.9vw,13px)] leading-[1.05] font-bold select-none"
@@ -138,17 +164,38 @@ function Wordmark() {
   );
 }
 
+const INTRO = "./chert";
+const LOGO_AT = typed(INTRO, 150) + 120;
+const LINES = MARK.split("\n");
+const WORD_AT = LOGO_AT + LINES.length * 22;
+const ABOUT_AT = WORD_AT + 450;
+const PRODUCTS_AT = typed("cat about", ABOUT_AT) + 350;
+const CONTACT_AT = typed("ls products/", PRODUCTS_AT) + 350;
+const END = typed("cat contact", CONTACT_AT) + 200;
+
 function Home() {
+  const t = useClock(Math.max(END, WORD_AT + DONE * 60));
+  const tick = Math.max(-1, Math.min(DONE, Math.floor((t - WORD_AT) / 60)));
   return (
     <>
+      <div className="mb-6">
+        <Prompt>
+          <Typed text={INTRO} at={150} t={t} />
+        </Prompt>
+      </div>
       <pre
         className="m-0 mb-6 overflow-hidden text-[clamp(6px,1.9vw,13px)] leading-[1.05] tracking-[-0.15em] font-bold bg-[linear-gradient(170deg,#f2913d_30%,#26336a_75%)] bg-clip-text text-transparent select-none"
         aria-hidden="true"
       >
-        {MARK}
+        {LINES.map((line, i) => (
+          <span key={i} className={t >= LOGO_AT + i * 22 ? "" : "ty invisible"}>
+            {line}
+            {"\n"}
+          </span>
+        ))}
       </pre>
-      <Wordmark />
-      <Block cmd="cat about">
+      <Wordmark tick={t >= WORD_AT ? tick : -1} />
+      <Block cmd="cat about" at={ABOUT_AT} t={t}>
         <p className="m-0">
           an experimental product lab from{" "}
           <a className={LINK} href="https://www.trychert.com">
@@ -164,7 +211,7 @@ function Home() {
           direct to consumer. small, strange, and made by a few people.
         </p>
       </Block>
-      <Block cmd="ls products/">
+      <Block cmd="ls products/" at={PRODUCTS_AT} t={t}>
         <ul className="m-0 list-none p-0">
           {PRODUCTS.map(([name, what, url]) => (
             <li
@@ -188,21 +235,7 @@ function Home() {
           ))}
         </ul>
       </Block>
-      <Block cmd="tail lines.log">
-        <ul className="m-0 list-none p-0">
-          {LOG.map(([at, who, what]) => (
-            <li
-              key={who}
-              className="mb-2 grid grid-cols-1 sm:mb-0 sm:grid-cols-[6ch_12ch_1fr] sm:gap-[1ch]"
-            >
-              <span className="text-neutral-500">{at}</span>
-              <span className="text-neutral-400">{who}</span>
-              <span>{what}</span>
-            </li>
-          ))}
-        </ul>
-      </Block>
-      <Block cmd="cat contact">
+      <Block cmd="cat contact" at={CONTACT_AT} t={t}>
         <p className="m-0">
           platform <span className="text-neutral-500">→</span>{" "}
           <a className={LINK} href="https://www.trychert.com">
@@ -218,7 +251,7 @@ function Home() {
       </Block>
       <Prompt>
         <span
-          className="inline-block h-[1.15em] w-[1ch] bg-white align-text-bottom animate-[blink_1.1s_steps(1)_infinite] motion-reduce:animate-none"
+          className={`${t >= END ? "" : "ty invisible "}inline-block h-[1.15em] w-[1ch] bg-white align-text-bottom animate-[blink_1.1s_steps(1)_infinite] motion-reduce:animate-none`}
           aria-hidden="true"
         />
       </Prompt>
