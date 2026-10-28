@@ -24,7 +24,7 @@ const PRODUCTS: Array<[string, string, string | null]> = [
   [
     "together",
     "group facetime, streamed and in sync: camera grid, broadcast, watch party.",
-    null,
+    "https://together.chertlabs.com",
   ],
 ];
 
