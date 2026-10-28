@@ -28,11 +28,11 @@ const PRODUCTS: Array<[string, string, string | null]> = [
   ],
 ];
 
-const RULES = [
-  "you text first. we never message a number that hasn't messaged us.",
-  "consent is asked for each thing, separately. stop always works.",
-  "no app to install. no ads. no trackers.",
-  "you pay us directly. you are the customer, not the product.",
+const LOG: Array<[string, string, string]> = [
+  ["03:12", "autophobia", "wren read your message. wren is typing."],
+  ["08:02", "kyu", "it remembered what you said last night."],
+  ["21:47", "strangers", "someone picked up. they were already talking."],
+  ["--:--", "together", "not yet."],
 ];
 
 const LINK =
@@ -142,7 +142,7 @@ function Home() {
   return (
     <>
       <pre
-        className="m-0 mb-6 overflow-hidden text-[clamp(6px,1.9vw,13px)] leading-[1.05] font-bold bg-[linear-gradient(170deg,#f2913d_30%,#26336a_75%)] bg-clip-text text-transparent select-none"
+        className="m-0 mb-6 overflow-hidden text-[clamp(6px,1.9vw,13px)] leading-[1.05] tracking-[-0.15em] font-bold bg-[linear-gradient(170deg,#f2913d_30%,#26336a_75%)] bg-clip-text text-transparent select-none"
         aria-hidden="true"
       >
         {MARK}
@@ -188,12 +188,19 @@ function Home() {
           ))}
         </ul>
       </Block>
-      <Block cmd="cat rules">
-        <ol className="m-0 pl-[3ch]">
-          {RULES.map((r) => (
-            <li key={r}>{r}</li>
+      <Block cmd="tail lines.log">
+        <ul className="m-0 list-none p-0">
+          {LOG.map(([at, who, what]) => (
+            <li
+              key={who}
+              className="mb-2 grid grid-cols-1 sm:mb-0 sm:grid-cols-[6ch_12ch_1fr] sm:gap-[1ch]"
+            >
+              <span className="text-neutral-500">{at}</span>
+              <span className="text-neutral-400">{who}</span>
+              <span>{what}</span>
+            </li>
           ))}
-        </ol>
+        </ul>
       </Block>
       <Block cmd="cat contact">
         <p className="m-0">
