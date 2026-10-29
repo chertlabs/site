@@ -183,10 +183,11 @@ const ABOUT_AT = WORD_AT + 450;
 const PRODUCTS_AT = typed("cat about", ABOUT_AT) + 350;
 const CONTACT_AT = typed("ls products/", PRODUCTS_AT) + 350;
 const END = typed("cat contact", CONTACT_AT) + 200;
+const MORPH_AT = END + 1000;
 
 function Home() {
-  const t = useClock(Math.max(END, WORD_AT + DONE * 60));
-  const tick = Math.max(-1, Math.min(DONE, Math.floor((t - WORD_AT) / 60)));
+  const t = useClock(MORPH_AT + DONE * 60);
+  const tick = Math.max(-1, Math.min(DONE, Math.floor((t - MORPH_AT) / 60)));
   return (
     <>
       <div className="mb-6">
